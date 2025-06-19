@@ -44,7 +44,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Washington County, VA</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.css" />
     <style>
         body {
             margin: 0;
@@ -52,7 +51,7 @@
             font-family: Arial, sans-serif;
         }
         #map {
-            height: calc(100vh - 230px);
+            height: calc(100vh - 130px);
         }
         #header {
             height: 40px;
@@ -63,6 +62,16 @@
             font-size: 24px;
             font-weight: bold;
         }
+        #tract-selector {
+            height: 40px;
+            background: #f8f8f8;
+            padding: 10px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 1px solid #ccc;
+        }
         #filter-bar {
             height: 50px;
             background: #f8f8f8;
@@ -71,32 +80,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-        }
-        #slider-bar {
-            height: 50px;
-            background: #f0f0f0;
-            padding: 10px;
-            text-align: center;
-        }
-        #oz-table {
-            height: 50px;
-            background: #fff;
-            padding: 10px;
-            text-align: center;
-            font-family: Arial, sans-serif;
-            border-top: 1px solid #ccc;
-            overflow: auto;
-        }
-        #oz-table table {
-            margin: 0 auto;
-            border-collapse: collapse;
-        }
-        #oz-table th, #oz-table td {
-            padding: 5px 10px;
-            border: 1px solid #ccc;
-        }
-        #oz-table th {
-            background: #f8f8f8;
         }
         #links {
             height: 40px;
@@ -112,16 +95,38 @@
             color: #0066cc;
             text-decoration: none;
         }
+#income-table {
+    height: 80px;
+    background: #fff;
+    padding: 10px;
+    text-align: center;
+    font-family: Arial, sans-serif;
+    border-top: 1px solid #ccc;
+}
+#income-table table {
+    margin: 0 auto;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+#income-table th, #income-table td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: center;
+}
+#income-table th {
+    background: #f8f8f8;
+    font-weight: bold;
+}
         #links a:hover {
             text-decoration: underline;
         }
-        #filter-bar label {
+        #filter-bar label, #tract-selector label {
             margin: 0 15px;
             font-size: 14px;
             display: flex;
             align-items: center;
         }
-        #hoct-filter, #ffiec-filter {
+        #hoct-filter, #ffiec-filter, #tract-filter {
             margin-left: 5px;
             padding: 5px;
             font-family: Arial, sans-serif;
@@ -148,7 +153,9 @@
             position: absolute;
             background-color: white;
             min-width: 300px;
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            max-height: 300px;
+            overflow-y: auto;
+            box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
             z-index: 1000;
             border: 1px solid #ccc;
             border-radius: 3px;
@@ -202,7 +209,30 @@
 </head>
 <body>
     <div id="header">Washington County, VA</div>
+    <div id="tract-selector">
+        <label>Tract: 
+            <select id="tract-filter">
+                <option value="All">Select Tract</option>
+                <option value="101.01">101.01</option>
+                <option value="101.02">101.02</option>
+                <option value="102">102</option>
+                <option value="103.01">103.01</option>
+                <option value="103.02">103.02</option>
+                <option value="104.01">104.01</option>
+                <option value="104.02">104.02</option>
+                <option value="105.01">105.01</option>
+                <option value="105.02">105.02</option>
+                <option value="106.01">106.01</option>
+                <option value="106.02">106.02</option>
+                <option value="107">107</option>
+                <option value="108">108</option>
+                <option value="109">109</option>
+                <option value="110">110</option>
+            </select>
+        </label>
+    </div>
     <div id="filter-bar">
+        <label><input type="checkbox" id="oz-filter"> OZ</label>
         <label><input type="checkbox" id="qct-filter"> QCT</label>
         <label><input type="checkbox" id="dda-filter"> DDA</label>
         <label>HOCT: 
@@ -235,6 +265,7 @@
                     <a href="https://ajaim092.github.io/fauquiercounty/" target="_blank">Fauquier County</a>
                     <a href="https://ajaim092.github.io/floydmap/" target="_blank">Floyd County</a>
                     <a href="https://ajaim092.github.io/frederickcounty/" target="_blank">Frederick County</a>
+                    <a href="https://ajaim092.github.io/graysoncounty/" target="_blank">Grayson County</a>
                     <a href="https://ajaim092.github.io/leecounty/" target="_blank">Lee County</a>
                     <a href="https://ajaim092.github.io/manassas/" target="_blank">Manassas City</a>
                     <a href="https://ajaim092.github.io/pagecounty/" target="_blank">Page County</a>
@@ -244,6 +275,7 @@
                     <a href="https://ajaim092.github.io/russellcounty/" target="_blank">Russell County</a>
                     <a href="https://ajaim092.github.io/scottcounty/" target="_blank">Scott County</a>
                     <a href="https://ajaim092.github.io/shenandoahcounty/" target="_blank">Shenandoah County</a>
+                    <a href="https://ajaim092.github.io/smythcounty/" target="_blank">Smyth County</a>
                     <a href="https://ajaim092.github.io/tazewellcounty/" target="_blank">Tazewell County</a>
                     <a href="https://ajaim092.github.io/warrencounty/" target="_blank">Warren County</a>
                     <a href="https://ajaim092.github.io/washingtoncounty/" target="_blank">Washington County</a>
@@ -252,23 +284,26 @@
             </div>
         </label>
     </div>
-    <div id="slider-bar">
-        <label for="poverty-range">Poverty Rate (%): <span id="range-value">0.0 - 55.0</span></label>
-        <div id="poverty-range"></div>
-    </div>
     <div id="map"></div>
-    <div id="oz-table">
-        <table>
-            <tr><th>Opportunity Zone Tracts</th></tr>
-            <tr><td>None</td></tr>
-        </table>
-    </div>
+<div id="income-table">
+    <table>
+        <tr>
+            <th>State Area Median Income</th>
+            <th>Locality Area Median Income</th>
+            <th>Community Type</th>
+        </tr>
+        <tr>
+            <td>$78,100</td>
+            <td>$79,000</td>
+            <td>High-Income Jurisdiction</td>
+        </tr>
+    </table>
+</div>
     <div id="links">
         <a href="https://www.huduser.gov/portal/datasets/fmr/fmrs/FY2025_code/2025summary.odn?&year=2025&fmrtype=Final&selection_type=county&fips=5119199999" target="_blank">2025 Fair Market Rents (FMRs)</a>
         <a href="https://www.huduser.gov/portal/datasets/il/il2025/2025summary.odn?STATES=51.0&INPUTNAME=METRO47900M47900*5119199999%2BWashington+County&statelist=&stname=Virginia&wherefrom=&statefp=51&year=2025&ne_flag=&selection_type=county&incpath=&data=2025&SubmitButton=View+County+Calculations" target="_blank">2025 Income Limits</a>
     </div>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.js"></script>
     <script>
         var gk_isXlsx = false;
         var gk_xlsxFileLookup = {};
@@ -306,7 +341,7 @@
             attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
 
-        var washingtonCountyBoundary = L.geoJSON({
+        var washingtonCountyBoundary = {
             "type": "FeatureCollection",
             "features": [{
                 "type": "Feature",
@@ -319,10 +354,12 @@
                     "NAMELSAD": "Washington County"
                 }
             }]
-        }, {
+        };
+
+        L.geoJSON(washingtonCountyBoundary, {
             style: {
-                color: 'blue',
-                weight: 2,
+                color: 'black',
+                weight: 2.5,
                 opacity: 0.8,
                 fillColor: '#666',
                 fillOpacity: 0.1
@@ -341,8 +378,7 @@
                 oz: "NO",
                 poverty: 14.2,
                 ffiec: "Mixed",
-                hoct: "NO",
-                popup: "<b>Census Tract 101.01</b><br>Centroid: 36.6803222, -82.0814158<br>QCT: NO<br>DDA: NO<br>FFIEC: Mixed<br>Poverty Rate (2023): 14.2%"
+                popup: "<b>Census Tract 101.01</b><br>Qualified Census Tract: NO<br>Difficult Development Area: NO<br>High Opportunity Census Tract: NO<br>Opportunity Zone: NO<br>FFIEC: Mixed<br>Poverty Rate (2023): 14.2%"
             },
             {
                 name: "101.02",
@@ -352,8 +388,7 @@
                 oz: "NO",
                 poverty: 10.4,
                 ffiec: "Mixed",
-                hoct: "YES",
-                popup: "<b>Census Tract 101.02</b><br>Centroid: 36.6248909, -82.078807<br>QCT: NO<br>DDA: NO<br>FFIEC: Mixed<br>Poverty Rate (2023): 10.4%"
+                popup: "<b>Census Tract 101.02</b><br>Qualified Census Tract: NO<br>Difficult Development Area: NO<br>High Opportunity Census Tract: YES (10-12%)<br>Opportunity Zone: NO<br>FFIEC: Mixed<br>Poverty Rate (2023): 10.4%"
             },
             {
                 name: "102",
@@ -363,8 +398,7 @@
                 oz: "NO",
                 poverty: 11.0,
                 ffiec: "Mixed",
-                hoct: "YES",
-                popup: "<b>Census Tract 102</b><br>Centroid: 36.6371582, -82.2114306<br>QCT: NO<br>DDA: NO<br>FFIEC: Mixed<br>Poverty Rate (2023): 11.0%"
+                popup: "<b>Census Tract 102</b><br>Qualified Census Tract: NO<br>Difficult Development Area: NO<br>High Opportunity Census Tract: YES (10-12%)<br>Opportunity Zone: NO<br>FFIEC: Mixed<br>Poverty Rate (2023): 11.0%"
             },
             {
                 name: "103.01",
@@ -374,8 +408,7 @@
                 oz: "NO",
                 poverty: 18.2,
                 ffiec: "Rural",
-                hoct: "NO",
-                popup: "<b>Census Tract 103.01</b><br>Centroid: 36.7170453, -82.1932077<br>QCT: NO<br>DDA: NO<br>FFIEC: Rural<br>Poverty Rate (2023): 18.2%"
+                popup: "<b>Census Tract 103.01</b><br>Qualified Census Tract: NO<br>Difficult Development Area: NO<br>High Opportunity Census Tract: NO<br>Opportunity Zone: NO<br>FFIEC: Rural<br>Poverty Rate (2023): 18.2%"
             },
             {
                 name: "103.02",
@@ -385,8 +418,7 @@
                 oz: "NO",
                 poverty: 8.2,
                 ffiec: "Rural",
-                hoct: "YES",
-                popup: "<b>Census Tract 103.02</b><br>Centroid: 36.8176909, -81.9690403<br>QCT: NO<br>DDA: NO<br>FFIEC: Rural<br>Poverty Rate (2023): 8.2%"
+                popup: "<b>Census Tract 103.02</b><br>Qualified Census Tract: NO<br>Difficult Development Area: NO<br>High Opportunity Census Tract: YES (3-10%)<br>Opportunity Zone: NO<br>FFIEC: Rural<br>Poverty Rate (2023): 8.2%"
             },
             {
                 name: "104.01",
@@ -396,8 +428,7 @@
                 oz: "NO",
                 poverty: 5.7,
                 ffiec: "Mixed",
-                hoct: "YES",
-                popup: "<b>Census Tract 104.01</b><br>Centroid: 36.6665749, -82.0096363<br>QCT: NO<br>DDA: NO<br>FFIEC: Mixed<br>Poverty Rate (2023): 5.7%"
+                popup: "<b>Census Tract 104.01</b><br>Qualified Census Tract: NO<br>Difficult Development Area: NO<br>High Opportunity Census Tract: YES (3-10%)<br>Opportunity Zone: NO<br>FFIEC: Mixed<br>Poverty Rate (2023): 5.7%"
             },
             {
                 name: "104.02",
@@ -407,8 +438,7 @@
                 oz: "NO",
                 poverty: 6.4,
                 ffiec: "Mixed",
-                hoct: "YES",
-                popup: "<b>Census Tract 104.02</b><br>Centroid: 36.7245013, -82.0178816<br>QCT: NO<br>DDA: NO<br>FFIEC: Mixed<br>Poverty Rate (2023): 6.4%"
+                popup: "<b>Census Tract 104.02</b><br>Qualified Census Tract: NO<br>Difficult Development Area: NO<br>High Opportunity Census Tract: YES (3-10%)<br>Opportunity Zone: NO<br>FFIEC: Mixed<br>Poverty Rate (2023): 6.4%"
             },
             {
                 name: "105.01",
@@ -418,8 +448,7 @@
                 oz: "NO",
                 poverty: 12.7,
                 ffiec: "Mixed",
-                hoct: "NO",
-                popup: "<b>Census Tract 105.01</b><br>Centroid: 36.7273359, -81.9667642<br>QCT: NO<br>DDA: NO<br>FFIEC: Mixed<br>Poverty Rate (2023): 12.7%"
+                popup: "<b>Census Tract 105.01</b><br>Qualified Census Tract: NO<br>Difficult Development Area: NO<br>High Opportunity Census Tract: NO<br>Opportunity Zone: NO<br>FFIEC: Mixed<br>Poverty Rate (2023): 12.7%"
             },
             {
                 name: "105.02",
@@ -429,8 +458,7 @@
                 oz: "NO",
                 poverty: 17.5,
                 ffiec: "Urban",
-                hoct: "NO",
-                popup: "<b>Census Tract 105.02</b><br>Centroid: 36.7136541, -81.9531009<br>QCT: NO<br>DDA: NO<br>FFIEC: Urban<br>Poverty Rate (2023): 17.5%"
+                popup: "<b>Census Tract 105.02</b><br>Qualified Census Tract: NO<br>Difficult Development Area: NO<br>High Opportunity Census Tract: NO<br>Opportunity Zone: NO<br>FFIEC: Urban<br>Poverty Rate (2023): 17.5%"
             },
             {
                 name: "106.01",
@@ -440,8 +468,7 @@
                 oz: "NO",
                 poverty: 11.2,
                 ffiec: "Mixed",
-                hoct: "YES",
-                popup: "<b>Census Tract 106.01</b><br>Centroid: 36.7241457, -81.8838018<br>QCT: NO<br>DDA: NO<br>FFIEC: Mixed<br>Poverty Rate (2023): 11.2%"
+                popup: "<b>Census Tract 106.01</b><br>Qualified Census Tract: NO<br>Difficult Development Area: NO<br>High Opportunity Census Tract: YES (10-12%)<br>Opportunity Zone: NO<br>FFIEC: Mixed<br>Poverty Rate (2023): 11.2%"
             },
             {
                 name: "106.02",
@@ -451,8 +478,7 @@
                 oz: "NO",
                 poverty: 6.7,
                 ffiec: "Mixed",
-                hoct: "YES",
-                popup: "<b>Census Tract 106.02</b><br>Centroid: 36.7718993, -81.8595768<br>QCT: NO<br>DDA: NO<br>FFIEC: Mixed<br>Poverty Rate (2023): 6.7%"
+                popup: "<b>Census Tract 106.02</b><br>Qualified Census Tract: NO<br>Difficult Development Area: NO<br>High Opportunity Census Tract: YES (3-10%)<br>Opportunity Zone: NO<br>FFIEC: Mixed<br>Poverty Rate (2023): 6.7%"
             },
             {
                 name: "107",
@@ -462,8 +488,7 @@
                 oz: "NO",
                 poverty: 11.1,
                 ffiec: "Rural",
-                hoct: "YES",
-                popup: "<b>Census Tract 107</b><br>Centroid: 36.8220805, -81.7892189<br>QCT: NO<br>DDA: NO<br>FFIEC: Rural<br>Poverty Rate (2023): 11.1%"
+                popup: "<b>Census Tract 107</b><br>Qualified Census Tract: NO<br>Difficult Development Area: NO<br>High Opportunity Census Tract: YES (10-12%)<br>Opportunity Zone: NO<br>FFIEC: Rural<br>Poverty Rate (2023): 11.1%"
             },
             {
                 name: "108",
@@ -473,8 +498,7 @@
                 oz: "NO",
                 poverty: 5.4,
                 ffiec: "Rural",
-                hoct: "YES",
-                popup: "<b>Census Tract 108</b><br>Centroid: 36.6889449, -81.7284514<br>QCT: NO<br>DDA: NO<br>FFIEC: Rural<br>Poverty Rate (2023): 5.4%"
+                popup: "<b>Census Tract 108</b><br>Qualified Census Tract: NO<br>Difficult Development Area: NO<br>High Opportunity Census Tract: YES (3-10%)<br>Opportunity Zone: NO<br>FFIEC: Rural<br>Poverty Rate (2023): 5.4%"
             },
             {
                 name: "109",
@@ -484,8 +508,7 @@
                 oz: "NO",
                 poverty: 14.6,
                 ffiec: "Rural",
-                hoct: "NO",
-                popup: "<b>Census Tract 109</b><br>Centroid: 36.6569321, -81.8239077<br>QCT: NO<br>DDA: NO<br>FFIEC: Rural<br>Poverty Rate (2023): 14.6%"
+                popup: "<b>Census Tract 109</b><br>Qualified Census Tract: NO<br>Difficult Development Area: NO<br>High Opportunity Census Tract: NO<br>Opportunity Zone: NO<br>FFIEC: Rural<br>Poverty Rate (2023): 14.6%"
             },
             {
                 name: "110",
@@ -495,8 +518,7 @@
                 oz: "NO",
                 poverty: 5.0,
                 ffiec: "Rural",
-                hoct: "YES",
-                popup: "<b>Census Tract 110</b><br>Centroid: 36.6303986, -81.9560312<br>QCT: NO<br>DDA: NO<br>FFIEC: Rural<br>Poverty Rate (2023): 5.0%"
+                popup: "<b>Census Tract 110</b><br>Qualified Census Tract: NO<br>Difficult Development Area: NO<br>High Opportunity Census Tract: YES (3-10%)<br>Opportunity Zone: NO<br>FFIEC: Rural<br>Poverty Rate (2023): 5.0%"
             }
         ];
 
@@ -510,23 +532,30 @@
 
         function updateMarkers() {
             markerLayer.clearLayers();
+            var ozFilter = document.getElementById("oz-filter").checked;
             var qctFilter = document.getElementById("qct-filter").checked;
             var ddaFilter = document.getElementById("dda-filter").checked;
             var hoctFilter = document.getElementById("hoct-filter").value;
             var ffiecFilter = document.getElementById("ffiec-filter").value;
-            var slider = document.getElementById("poverty-range");
-            var [minPoverty, maxPoverty] = slider.noUiSlider.get();
+            var tractFilter = document.getElementById("tract-filter").value;
+
             tracts.forEach(function(tract) {
                 var showMarker = true;
-                if (qctFilter && !(tract.qct === "YES" && tract.dda !== "YES")) showMarker = false;
-                if (ddaFilter && !(tract.dda === "YES" && tract.qct !== "YES")) showMarker = false;
-                if (hoctFilter !== "All") {
-                    if (hoctFilter === "12-10" && !(tract.poverty < 12 && tract.poverty >= 10)) showMarker = false;
-                    if (hoctFilter === "10-3" && !(tract.poverty < 10 && tract.poverty >= 3)) showMarker = false;
-                    if (hoctFilter === "3-0" && !(tract.poverty < 3)) showMarker = false;
+
+                if (tractFilter !== "All") {
+                    showMarker = tract.name === tractFilter;
+                } else {
+                    if (ozFilter && tract.oz !== "YES") showMarker = false;
+                    if (qctFilter && tract.qct !== "YES") showMarker = false;
+                    if (ddaFilter && tract.dda !== "YES") showMarker = false;
+                    if (hoctFilter !== "All") {
+                        if (hoctFilter === "12-10" && !(tract.poverty < 12 && tract.poverty >= 10)) showMarker = false;
+                        if (hoctFilter === "10-3" && !(tract.poverty < 10 && tract.poverty >= 3)) showMarker = false;
+                        if (hoctFilter === "3-0" && !(tract.poverty < 3)) showMarker = false;
+                    }
+                    if (ffiecFilter !== "All" && tract.ffiec !== ffiecFilter) showMarker = false;
                 }
-                if (ffiecFilter !== "All" && tract.ffiec !== ffiecFilter) showMarker = false;
-                if (tract.poverty < minPoverty || tract.poverty > maxPoverty) showMarker = false;
+
                 if (showMarker) {
                     var marker = L.marker(tract.centroid, {
                         icon: L.divIcon({
@@ -543,40 +572,37 @@
             });
         }
 
-        var slider = document.getElementById("poverty-range");
-        noUiSlider.create(slider, {
-            start: [0, 55],
-            range: {
-                'min': 0,
-                'max': 55
-            },
-            step: 0.1,
-            connect: true
-        });
-        slider.noUiSlider.on("update", function(values, handle) {
-            var minValue = values[0];
-            var maxValue = values[1];
-            document.getElementById("range-value").textContent = minValue + " - " + maxValue;
-            updateMarkers();
-        });
-
-        updateMarkers();
+        document.getElementById("oz-filter").addEventListener("change", updateMarkers);
         document.getElementById("qct-filter").addEventListener("change", updateMarkers);
         document.getElementById("dda-filter").addEventListener("change", updateMarkers);
         document.getElementById("hoct-filter").addEventListener("change", updateMarkers);
         document.getElementById("ffiec-filter").addEventListener("change", updateMarkers);
+        document.getElementById("tract-filter").addEventListener("change", function(e) {
+            var selected = e.target.value;
+            if (selected === "All") {
+                map.setView([36.710, -81.941], 11);
+            } else {
+                var tract = tracts.find(t => t.name === selected);
+                if (tract) {
+                    map.setView(tract.centroid, 13);
+                }
+            }
+            updateMarkers();
+        });
 
         var legend = L.control({ position: "bottomright" });
         legend.onAdd = function(map) {
             var div = L.DomUtil.create("div", "leaflet-control-legend");
             div.innerHTML = `
-                <div class="legend-item"><span class="legend-color" style="background: yellow;"></span>QCT</div>
-                <div class="legend-item"><span class="legend-color" style="background: red;"></span>DDA</div>
-                <div class="legend-item"><span class="legend-color" style="background: blue;"></span>Census Tract</div>
+        <div class="legend-item"><span class="legend-color" style="background: yellow;"></span>Qualified Census Tract (QCT)</div>
+        <div class="legend-item"><span class="legend-color" style="background: red;"></span>Difficult Development Area (DDA)</div>
+        <div class="legend-item"><span class="legend-color" style="background: blue;"></span>Census Tract</div>
             `;
             return div;
         };
         legend.addTo(map);
+
+        updateMarkers();
     </script>
 </body>
 </html>
